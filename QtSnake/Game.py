@@ -16,7 +16,7 @@ from PyQt5.QtCore import QTimer, pyqtSignal
 class GameOver(QtWidgets.QWidget):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
-        uic.loadUi('_QWidgets/Snake/Interface/GameOver.ui', self)
+        uic.loadUi('QtSnake/Interface/GameOver.ui', self)
 
     def Score(self, f_Text):
         """ change score text """
@@ -26,7 +26,7 @@ class Game(QtWidgets.QWidget):
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
-        uic.loadUi('_QWidgets/Snake/Interface/GameBoard.ui', self)
+        uic.loadUi('QtSnake/Interface/GameBoard.ui', self)
 
         # define some config variables
         self.m_Score = 0                    # store the current score

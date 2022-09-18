@@ -3,10 +3,12 @@
 # ----------------------------------------------------------------------------
 # Created By  : Bernhard Hofer  -   Mail@Bernhard-hofer.at
 #
-# Example File for QtSnake
+# Example File for QtCamera
 # ---------------------------------------------------------------------------
 import sys
 from PyQt5 import QtWidgets, uic
+
+from QtCamera.Camera import Camera
 
 class Example(QtWidgets.QMainWindow):
     def __init__(self):
@@ -14,8 +16,14 @@ class Example(QtWidgets.QMainWindow):
         uic.loadUi('Example.ui', self)
         self.show()
 
-        #self.formLayout.addWidget(Game())
+        _Cam = Camera()
+        _Cam.m_Location_Save = "teststd"
+        _Cam.m_Signal_Kill.connect(self.boing)
 
+        self.Layout.addWidget(_Cam)
+
+    def boing(self, e):
+        print(e)
 app = QtWidgets.QApplication(sys.argv)
 window = Example()
 app.exec_()
