@@ -17,9 +17,6 @@ class Example(QtWidgets.QMainWindow):
         self.show()
 
         _Cam = Camera()
-        _Cam.m_Location_Save = "teststd"
-        _Cam.m_Signal_Kill.connect(self.boing)
-
         self.Layout.addWidget(_Cam)
 
     def boing(self, e):
