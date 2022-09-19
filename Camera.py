@@ -16,11 +16,16 @@ class Example(QtWidgets.QMainWindow):
         uic.loadUi('Example.ui', self)
         self.show()
 
-        _Cam = Camera()
+        _Cam = Camera(m_Path_Save=r"C:\Users\Bernhard\Documents\GitHub\PyQt-Widgets\Images",
+                      m_Barcode_Scan_Active=True,
+                      m_Sound_Active=True,
+                      m_Show_Preview=True)
+        _Cam.m_Signal_Barcode_Found.connect(self.Bar)
         self.Layout.addWidget(_Cam)
 
-    def boing(self, e):
-        print(e)
+    def Bar(self, result):
+        print(result)
+
 app = QtWidgets.QApplication(sys.argv)
 window = Example()
 app.exec_()
