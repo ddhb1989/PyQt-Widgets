@@ -16,10 +16,11 @@ class Example(QtWidgets.QMainWindow):
         uic.loadUi('Example.ui', self)
         self.show()
 
-        _Cam = Camera(m_Path_Save=r"C:\Users\Bernhard\Documents\GitHub\PyQt-Widgets\Images",
+        _Cam = Camera(m_Path_Save=r"C:\Users\V165994\Documents\GitHub\PyQt-Widgets\Images",
                       m_Barcode_Scan_Active=True,
                       m_Sound_Active=True,
-                      m_Show_Preview=True)
+                      m_Show_Preview=True,
+                      m_Show_Folders=True)
         _Cam.m_Signal_Barcode_Found.connect(self.Bar)
         self.Layout.addWidget(_Cam)
 

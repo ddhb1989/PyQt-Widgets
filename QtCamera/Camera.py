@@ -15,14 +15,32 @@
 import cv2
 import time
 import os
+from glob import glob
 from pyzbar.pyzbar import decode
 
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import QTimer, pyqtSignal, QThread, Qt
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import QTimer, pyqtSignal, QThread, Qt, QSize
+from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtMultimedia import QSound
 
 import numpy as np
+
+class PopUp_NewFolder(QtWidgets.QWidget):
+    m_Signal_FolderName = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        uic.loadUi('QtCamera/Interface/PopUp-NewFolder.ui', self)
+        self.show()
+
+        # center window
+        self.setContentsMargins(0, 0, 0, 0)
+        self.move(parent.frameGeometry().center()-self.frameGeometry().center())
+
+        # add bindings
+        self.pushButton_Save.clicked.connect(lambda e, x=self.lineEdit_FolderName: self.m_Signal_FolderName.emit(self.lineEdit_FolderName.text()))
+        self.pushButton_Save.clicked.connect(lambda e: self.deleteLater())
+        self.pushButton_Close.clicked.connect(lambda e: self.deleteLater())
 
 class VideoThread(QThread):
     # define some signals
@@ -119,7 +137,8 @@ class Camera(QtWidgets.QWidget):
     m_Barcode_Scan_Active = False                   # True/False - activates barcode/qrscan
     m_Sound_Active = True                           # True/False - activates sound
     m_Path_Save = "/"                               # Path where pictures should be saved
-    m_Show_Preview = True
+    m_Show_Preview = True                           # hide or show the taken pictures
+    m_Show_Folders = True                           # hide or show the folder tree
 
     # signals
     m_Signal_Barcode_Found = pyqtSignal(list)       # signal if a barcodes was found
@@ -143,6 +162,7 @@ class Camera(QtWidgets.QWidget):
         self.pushButton_Close.clicked.connect(self._KillCamera)
         self.pushButton_Change.clicked.connect(self._ChangeCamera)
         self.pushButton_Picture.clicked.connect(self._TakePicture)
+        self.Folder_Tree.itemClicked.connect(self._Event_Folder_Click)
 
         # prepare interface
         self.Hide_Button_Change()
@@ -151,6 +171,11 @@ class Camera(QtWidgets.QWidget):
             self.Hide_Preview()
         else:
             self.Show_Preview()
+        if self.m_Show_Folders == False:
+            self.Hide_Folders()
+        else:
+            self.Show_Folders()
+            self._CreateDirectoryTree()
 
         # start camera thread
         self.m_Thread_Video.m_Path_Save = self.m_Path_Save
@@ -164,6 +189,50 @@ class Camera(QtWidgets.QWidget):
         self.m_Thread_Video.m_Signal_Picture_Taken.connect(self._PictureTaken)  # picture was taken
 
         self.m_Thread_Video.start()
+
+    def _CreateDirectoryTree(self):
+        """ create directory tree """
+        self.Folder_Tree.clear()
+        def _CreateTree(f_Path, f_Parent, _Depth=0):
+            _Item = QtWidgets.QTreeWidgetItem(f_Parent)
+            _Item.setText(0, "Neuen Ordner erstellen...")
+
+            _Dir = glob(f_Path + "/*/", recursive=True)
+            if len(_Dir) == 0:
+                return
+
+            for _Folder in _Dir:
+                _Item = QtWidgets.QTreeWidgetItem(f_Parent)
+                _Item.setText(0, os.path.basename(os.path.normpath(_Folder)))
+
+                _CreateTree(_Folder, _Item)
+
+        _CreateTree(self.m_Path_Save, self.Folder_Tree)
+
+    def _Event_Folder_Click(self, f_Event):
+        _Path = self.m_Path_Save
+
+        _Item = f_Event
+        while _Item.parent() is not None:
+            _Path += "/" + _Item.parent().text(0)
+            _Item = _Item.parent()
+
+        # create a new folder
+        if f_Event.text(0) == "Neuen Ordner erstellen...":
+            def _CreateFolder(f_Folder):
+                print(_Path + "/" + f_Folder)
+                try:
+                    os.mkdir(_Path + "/" + f_Folder)
+                    self.m_Thread_Video.m_Path_Save = _Path + "/" + f_Folder
+                except:
+                    QtWidgets.QMessageBox.information(self, "Fehler", "Der Ordner konnte nicht erstellt werden.!" + str(e), QtWidgets.QMessageBox.Ok)
+                self._CreateDirectoryTree()
+
+            _PopUp = PopUp_NewFolder(self)
+            _PopUp.m_Signal_FolderName.connect(_CreateFolder)
+        else: # set folder as saving directory
+            _Path += "/" + f_Event.text(0)
+            self.m_Thread_Video.m_Path_Save = _Path
 
     def _CodesFound(self, f_Result:list):
         """
@@ -278,6 +347,11 @@ class Camera(QtWidgets.QWidget):
         self.Preview_Header.hide()
         self.Preview_Scrollarea.hide()
 
+    def Hide_Folders(self):
+        """ hides directory tree """
+        self.Folder_Header.hide()
+        self.Folder_Scrollarea.hide()
+
     def Show_Button_Close(self):
         """ show the close button """
         self.pushButton_Close.show()
@@ -298,3 +372,8 @@ class Camera(QtWidgets.QWidget):
         """ show preview of taken pictures """
         self.Preview_Header.show()
         self.Preview_Scrollarea.show()
+
+    def Show_Folders(self):
+        """ show directory tree """
+        self.Folder_Header.show()
+        self.Folder_Scrollarea.show()
