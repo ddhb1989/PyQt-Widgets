@@ -6,6 +6,7 @@
 # Example File for QtCamera
 # ---------------------------------------------------------------------------
 import sys
+import os
 from PyQt5 import QtWidgets, uic
 
 from QtCamera.Camera import Camera
@@ -16,11 +17,12 @@ class Example(QtWidgets.QMainWindow):
         uic.loadUi('Example.ui', self)
         self.show()
 
-        _Cam = Camera(m_Path_Save=r"C:\Users\V165994\Documents\GitHub\PyQt-Widgets\Images",
+        _Cam = Camera(m_Path_Save=os.path.dirname(os.path.realpath(__file__))+ "/Images",
                       m_Barcode_Scan_Active=True,
                       m_Sound_Active=True,
                       m_Show_Preview=True,
-                      m_Show_Folders=True)
+                      m_Show_Folders=True,
+                      m_Preview_Scale=80)
         _Cam.m_Signal_Barcode_Found.connect(self.Bar)
         self.Layout.addWidget(_Cam)
 
