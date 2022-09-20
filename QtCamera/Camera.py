@@ -410,6 +410,9 @@ class Camera(QtWidgets.QWidget):
         if f_Event.text(0) == "Neuen Ordner erstellen...":
             def _CreateFolder(f_Folder):
                 try:
+                    if not os.path.exists(_Path):
+                        os.makedirs(_Path)
+
                     os.mkdir(_Path + "/" + f_Folder)
                     self.m_Thread_Video.m_Path_Save = _Path + "/" + f_Folder
                     self.label_CurrentFolder.setText("Aktuelles Verzeichnis: {}".format((_Path + "/" + f_Folder).replace(self.m_Path_Save, "")))
