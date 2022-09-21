@@ -8,7 +8,10 @@
 import sys
 import os
 from PyQt5 import QtWidgets, uic
-
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
+import sys
+sys.excepthook = except_hook
 from QtCamera.Camera import Camera
 
 class Example(QtWidgets.QMainWindow):

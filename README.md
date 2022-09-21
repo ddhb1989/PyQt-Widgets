@@ -5,9 +5,16 @@ A Libary of some self written PyQt Widgets
 PyQtSnake is a simple Snake game that is easy to implement
 
 ## PyQtCamera
-Camera Widget with integrated Barcode scanner and the ability to take pictures and videos.
-Preview of taken pictures and videos are included.
-Also a Folder control is involved
+Camera Widget<br/>
+- Recording Pictures and Videos with sound<br>
+- Scanning Barcodes and QRCodes
+- Directory control integrated
+- Preview of currently taken media
+
 Needed Modules:
- pip install opencv-python
- pip install pyzbar
+```
+pip install opencv-python
+pip install pyzbar
+pip install ffmpeg-pythonm
+pip install pyaudio
+```

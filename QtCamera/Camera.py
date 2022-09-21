@@ -9,13 +9,18 @@
 # modules needed
 # pip install opencv-python
 # pip install pyzbar
+# pip install ffmpeg-pythonm
+# pip install pyaudio
 
 # TODO: Open Preview picture Maybe in our own Picture viewer Widget?
-# Sound on video recording?===???
 # ---------------------------------------------------------------------------
 import cv2
+import pyaudio
+import wave
+import tempfile
 import time
 import os
+import numpy as np
 from glob import glob
 from pyzbar.pyzbar import decode
 
@@ -24,8 +29,8 @@ from PyQt5.QtCore import QTimer, pyqtSignal, QThread, Qt, QSize
 from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtMultimedia import QSound, QCamera
 
-import numpy as np
 
+""" POPUP Window for new folder creation """
 class PopUp_NewFolder(QtWidgets.QWidget):
     m_Signal_FolderName = pyqtSignal(str)
 
@@ -45,6 +50,7 @@ class PopUp_NewFolder(QtWidgets.QWidget):
         self.pushButton_Close.clicked.connect(lambda e: self.deleteLater())
         self.lineEdit_FolderName.returnPressed.connect(self.pushButton_Save.click)
 
+""" POPUP Window for delete confirmation """
 class PopUp_DeletePicture(QtWidgets.QWidget):
     m_Signal_Ack = pyqtSignal(bool)
 
@@ -62,6 +68,49 @@ class PopUp_DeletePicture(QtWidgets.QWidget):
         self.pushButton_Save.clicked.connect(lambda e: self.deleteLater())
         self.pushButton_Close.clicked.connect(lambda e: self.deleteLater())
 
+""" QThread for recording Audio """
+class AudioThread(QThread):
+    m_Signal_Finished = pyqtSignal(str)     # returns the filename when finished
+
+    m_Recording = True
+    m_Audio_Filename = tempfile.gettempdir() + "/" + str(int(time.time())) + ".wav"
+    m_Audio = pyaudio.PyAudio()
+    m_Audio_Frames = []
+
+    def run(self):
+        self.m_Stream = self.m_Audio.open(format=pyaudio.paInt16,
+                                          channels=2,
+                                          rate=44100,
+                                          input=True,
+                                          frames_per_buffer=1024)
+
+        # start recording
+        self.m_Stream.start_stream()
+        self.m_Audio_Frames = []
+        while self.m_Recording:
+            self.m_Audio_Frames.append(self.m_Stream.read(1024))
+            if not self.m_Recording:
+                break
+
+
+    def stop(self):
+        """ Finishes the audio recording therefore the thread too"""
+        if self.m_Recording:
+            self.m_Recording = False
+            self.m_Stream.stop_stream()
+            self.m_Stream.close()
+            #self.m_Audio.terminate()
+
+            waveFile = wave.open(self.m_Audio_Filename, 'wb')
+            waveFile.setnchannels(2)
+            waveFile.setsampwidth(self.m_Audio.get_sample_size(pyaudio.paInt16))
+            waveFile.setframerate(44100)
+            waveFile.writeframes(b''.join(self.m_Audio_Frames))
+            waveFile.close()
+
+            self.m_Signal_Finished.emit(self.m_Audio_Filename)
+
+""" QThread for Video recording and viewer frame """
 class VideoThread(QThread):
     # define some signals
     m_Signal_Frame = pyqtSignal(np.ndarray)         # signal that contains the image
@@ -157,15 +206,34 @@ class VideoThread(QThread):
         if self.m_Video_Recording_Started == True:
             self.m_Video_Recording_Started = False
             self.m_Video_Writer.release()
+            self.m_Thread_Audio.stop()
+
+            # merge video and audio
+            import subprocess
+            cmd = os.path.dirname(os.path.realpath(__file__)) + "/ffmpeg.exe -y -ac 2 -channel_layout stereo -i " + self.m_Thread_Audio.m_Audio_Filename + " -i " + self.m_Video_Temp_Filename + " -pix_fmt yuv420p " + self.m_Video_Filename
+            subprocess.call(cmd, shell=True)
+            try:
+                os.remove(self.m_Thread_Audio.m_Audio_Filename)
+                os.remove(self.m_Video_Temp_Filename)
+            except:
+                pass
             self.m_Signal_Video_Taken.emit(self.m_Video_Filename)
             return
 
         # prepare our writer
         _Width = int(self.m_Cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         _Height = int(self.m_Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.m_Video_Filename = _Filename = self.m_Path_Save + '\\' + str(int(time.time())) + '.mp4'
-        self.m_Video_Writer = cv2.VideoWriter(self.m_Video_Filename, cv2.VideoWriter_fourcc(*'DIVX'), 20, (_Width, _Height))
+
+        self.m_Video_Filename = self.m_Path_Save + '\\' + str(int(time.time())) + '.mp4'
+
+        # start recording in a temp filename
+        self.m_Video_Temp_Filename = tempfile.gettempdir() + "/" + str(int(time.time())) + '.mp4'
+        self.m_Video_Writer = cv2.VideoWriter(self.m_Video_Temp_Filename, cv2.VideoWriter_fourcc(*'DIVX'), 10, (_Width, _Height))
         self.m_Video_Recording_Started = True
+
+        # start audio recording
+        self.m_Thread_Audio = AudioThread()
+        self.m_Thread_Audio.start()
 
     def StopCamera(self):
         """ stop camera """
@@ -190,6 +258,7 @@ class VideoThread(QThread):
 
         return _Cameras
 
+""" QWidget Class for using Camera """
 class Camera(QtWidgets.QWidget):
     # Configurations
     m_Barcode_Scan_Active = False                   # True/False - activates barcode/qrscan
@@ -272,6 +341,7 @@ class Camera(QtWidgets.QWidget):
     def _CreateDirectoryTree(self):
         """ create directory tree """
         self.Folder_Tree.clear()
+        _Match = self.m_Thread_Video.m_Path_Save # needed to select the right folder in recursive function
         def _CreateTree(f_Path, f_Parent, _Depth=0):
             _Item = QtWidgets.QTreeWidgetItem(f_Parent)
             _Item.setText(0, "Neuen Ordner erstellen...")
@@ -289,6 +359,10 @@ class Camera(QtWidgets.QWidget):
                 _Icon = QIcon()
                 _Icon.addFile(os.path.dirname(os.path.realpath(__file__)) + "/Images/Folder.png")
                 _Item.setIcon(0, _Icon)
+
+                # select item iif it matches our saving path
+                if os.path.normpath(_Folder) == os.path.normpath(self.m_Thread_Video.m_Path_Save):
+                    self.Folder_Tree.setCurrentItem(_Item, 0)
 
                 _CreateTree(_Folder, _Item)
 
@@ -329,10 +403,12 @@ class Camera(QtWidgets.QWidget):
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888).scaledToWidth(250, Qt.FastTransformation)
 
         _Frame = QtWidgets.QFrame()
+        _Frame.setStyleSheet("background: #FFF;border: 1px solid #AAA ;margin: 5px 0px;")
         _VLayout = QtWidgets.QVBoxLayout(_Frame)
         # preview picture
         #_Picture = QImage(f_Result).scaledToWidth(250, Qt.FastTransformation)
         _Label = QtWidgets.QLabel()
+        _Label.setStyleSheet("border: 0px;")
         _Label.setAlignment(Qt.AlignCenter)
         _Label.setPixmap(QPixmap.fromImage(convert_to_Qt_format))
         _VLayout.addWidget(_Label)
@@ -360,10 +436,12 @@ class Camera(QtWidgets.QWidget):
             QSound.play(os.path.dirname(os.path.realpath(__file__)) + "/Sounds/Shutter.wav")
 
         _Frame = QtWidgets.QFrame()
+        _Frame.setStyleSheet("background: #FFF;border: 1px solid #AAA ;margin: 5px 0px;")
         _VLayout = QtWidgets.QVBoxLayout(_Frame)
         # preview picture
         _Picture = QImage(f_Result).scaledToWidth(250, Qt.FastTransformation)
         _Label = QtWidgets.QLabel()
+        _Label.setStyleSheet("border: 0px;")
         _Label.setAlignment(Qt.AlignCenter)
         _Label.setPixmap(QPixmap.fromImage(_Picture))
         _VLayout.addWidget(_Label)

@@ -153,7 +153,7 @@ background: transparent;</string>
 background: transparent;</string>
             </property>
             <property name="text">
-             <string>Das Foto wird im Auftragsorder gespeichert</string>
+             <string>Die Aufnahme wird im Auftragsorder gespeichert</string>
             </property>
            </widget>
           </item>
@@ -371,7 +371,8 @@ QTreeWidget::item::hover{
 }
 QTreeWidget::item::selected{
 	background: #90ee90;
-}</string>
+}
+</string>
               </property>
               <property name="showDropIndicator" stdset="0">
                <bool>false</bool>
@@ -480,9 +481,7 @@ background: transparent;</string>
           </property>
           <property name="styleSheet">
            <string notr="true">border: 0px;
-background: transparent;
-
-</string>
+background: transparent;</string>
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -502,7 +501,7 @@ background: transparent;
              <x>0</x>
              <y>0</y>
              <width>298</width>
-             <height>620</height>
+             <height>622</height>
             </rect>
            </property>
            <property name="sizePolicy">
