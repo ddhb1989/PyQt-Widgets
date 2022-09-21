@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
-# Created By  : Bernhard Hofer  -   bernhard.hofer@voestalpine.com
+# Created By  : Bernhard Hofer  -   Mail@Bernhard-Hofer.at
 #
-# Camera Widget with integrated Barcode scanner and the ability to take pictures
-# and videos
+# Camera Widget
+# - Recording Pictures and Videos with sound<br>
+# - Scanning Barcodes and QRCodes
+# - Directory control integrated
+# - Preview of currently taken media
 #
-# modules needed
+# Needed Modules:
+# ```
 # pip install opencv-python
 # pip install pyzbar
 # pip install ffmpeg-pythonm
 # pip install pyaudio
+# ```
 
 # TODO: Open Preview picture Maybe in our own Picture viewer Widget?
 # ---------------------------------------------------------------------------

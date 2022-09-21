@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
-# Created By  : Bernhard Hofer  -   Mail@Bernhard-hofer.at
+# Created By  : Bernhard Hofer  -   Mail@Bernhard-Hofer.at
 #
 # Example File for QtCamera
 # ---------------------------------------------------------------------------
-import sys
-import os
-from PyQt5 import QtWidgets, uic
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 import sys
 sys.excepthook = except_hook
+
+import os
+from PyQt5 import QtWidgets, uic
 from QtCamera.Camera import Camera
 
 class Example(QtWidgets.QMainWindow):
