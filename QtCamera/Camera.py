@@ -11,7 +11,7 @@
 # pip install pyzbar
 
 # TODO: Open Preview picture Maybe in our own Picture viewer Widget?
-# Preview of taken videos possible??
+# Sound on video recording?===???
 # ---------------------------------------------------------------------------
 import cv2
 import time
@@ -22,7 +22,7 @@ from pyzbar.pyzbar import decode
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QTimer, pyqtSignal, QThread, Qt, QSize
 from PyQt5.QtGui import QImage, QPixmap, QIcon
-from PyQt5.QtMultimedia import QSound
+from PyQt5.QtMultimedia import QSound, QCamera
 
 import numpy as np
 
@@ -74,6 +74,7 @@ class VideoThread(QThread):
     m_Barcode_Scan = True
     m_Path_Save = "/"
     m_Preview_Scale = 100
+    m_Force_Cam = 0
 
     # class vars
     m_Cameras_Available = []
@@ -88,6 +89,10 @@ class VideoThread(QThread):
 
         # start cam
         self.m_Camera_Run = True
+        if self.m_Force_Cam in self.m_Cameras_Available:
+            self.m_Camera_Current = self.m_Force_Cam
+        else:
+            self.m_Camera_Current = 0
         self.m_Cap = cv2.VideoCapture(self.m_Camera_Current, cv2.CAP_DSHOW)
         self.m_Cap.set(3, 1280)
         self.m_Cap.set(4, 720)
@@ -179,15 +184,10 @@ class VideoThread(QThread):
         """
         _Cameras = []
         _i = 0
-        while True:
-            self.m_Cap = cv2.VideoCapture(_i, cv2.CAP_DSHOW)
-            # no camera is available we break the loop
-            if not self.m_Cap.read()[0]:
-                break
-            # if a cam is available we continue the loop
+        while _i < len(QCamera.availableDevices()):
             _Cameras.append(_i)
-            self.m_Cap.release()
             _i += 1
+
         return _Cameras
 
 class Camera(QtWidgets.QWidget):
@@ -198,6 +198,8 @@ class Camera(QtWidgets.QWidget):
     m_Show_Preview = True                           # hide or show the taken pictures
     m_Show_Folders = True                           # hide or show the folder tree
     m_Preview_Scale = 100                           # scale factor of the cam viewer
+    m_Force_Cam = 0                                 # force a specific camera to be used
+    m_Kill_Timer = 5*60*1000                        # force the cam to shutdown
 
     # signals
     m_Signal_Barcode_Found = pyqtSignal(list)       # signal if a barcodes was found
@@ -211,13 +213,17 @@ class Camera(QtWidgets.QWidget):
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
-
         uic.loadUi(os.path.dirname(os.path.realpath(__file__)) + '/Interface/Camera.ui', self)
 
         # if valid **kwargs are available we set class vars
         for _Key in kwargs:
             if hasattr(self, _Key):
                 self.__setattr__(_Key, kwargs[_Key])
+
+        # start kill timer
+        self.m_Timer_Kill = QTimer()
+        self.m_Timer_Kill.timeout.connect(self._KillCamera)
+        self.m_Timer_Kill.start(self.m_Kill_Timer)
 
         # add bindings
         self.pushButton_Close.clicked.connect(self._KillCamera)
@@ -252,6 +258,7 @@ class Camera(QtWidgets.QWidget):
         self.m_Thread_Video.m_Barcode_Scan = self.m_Barcode_Scan_Active
         self.m_Thread_Video.m_Sound_Active = self.m_Sound_Active
         self.m_Thread_Video.m_Preview_Scale = self.m_Preview_Scale
+        self.m_Thread_Video.m_Force_Cam = self.m_Force_Cam
 
         # connect signals
         self.m_Thread_Video.m_Signal_Frame.connect(self._UpdateFrame)   # updates frame
@@ -401,7 +408,6 @@ class Camera(QtWidgets.QWidget):
 
     def _KillCamera(self):
         """ kill camera """
-        # emit signal
         # if we record stop recording
         if self.m_Thread_Video.m_Video_Recording_Started == True:
             self._RecordVideo()

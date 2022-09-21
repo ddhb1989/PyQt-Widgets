@@ -22,7 +22,8 @@ class Example(QtWidgets.QMainWindow):
                       m_Sound_Active=True,
                       m_Show_Preview=True,
                       m_Show_Folders=True,
-                      m_Preview_Scale=80)
+                      m_Preview_Scale=80,
+                      m_Force_Cam=1)
         _Cam.m_Signal_Barcode_Found.connect(self.Bar)
         self.Layout.addWidget(_Cam)
 
