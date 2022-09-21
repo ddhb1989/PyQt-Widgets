@@ -4,6 +4,11 @@ A Libary of some self written PyQt Widgets
 ## PyQtSnake
 PyQtSnake is a simple Snake game that is easy to implement
 
+## PyQtMediaViewer
+MediaViewer Widget<br />
+- Shows the media contents of a folder
+- Contains a integrated picture viewer
+
 ## PyQtCamera
 Camera Widget<br/>
 - Recording Pictures and Videos with sound<br>
