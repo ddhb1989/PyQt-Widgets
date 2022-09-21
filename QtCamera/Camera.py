@@ -50,7 +50,7 @@ class PopUp_DeletePicture(QtWidgets.QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        uic.loadUi(os.path.dirname(os.path.realpath(__file__)) + '/Interface/PopUp.ui', self)
+        uic.loadUi(os.path.dirname(os.path.realpath(__file__)) + '/Interface/PopUp-Delete.ui', self)
         self.show()
 
         # center window
@@ -68,6 +68,7 @@ class VideoThread(QThread):
     m_Signal_CamerasAvailable = pyqtSignal(list)    # signal available cameras
     m_Signal_Codes = pyqtSignal(list)                # signal qr codes
     m_Signal_Picture_Taken = pyqtSignal(str)        # signal returns name of picture
+    m_Signal_Video_Taken = pyqtSignal(str)          # video # signal returns name of picture
 
     # config variables
     m_Barcode_Scan = True
@@ -151,18 +152,20 @@ class VideoThread(QThread):
         if self.m_Video_Recording_Started == True:
             self.m_Video_Recording_Started = False
             self.m_Video_Writer.release()
+            self.m_Signal_Video_Taken.emit(self.m_Video_Filename)
             return
 
         # prepare our writer
         _Width = int(self.m_Cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         _Height = int(self.m_Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        _Filename = self.m_Path_Save + '\\' + str(int(time.time())) + '.mp4'
-        self.m_Video_Writer = cv2.VideoWriter(_Filename, cv2.VideoWriter_fourcc(*'DIVX'), 20, (_Width, _Height))
+        self.m_Video_Filename = _Filename = self.m_Path_Save + '\\' + str(int(time.time())) + '.mp4'
+        self.m_Video_Writer = cv2.VideoWriter(self.m_Video_Filename, cv2.VideoWriter_fourcc(*'DIVX'), 20, (_Width, _Height))
         self.m_Video_Recording_Started = True
 
     def StopCamera(self):
         """ stop camera """
         self.m_Camera_Run = False
+        self.m_Cap.release()
 
     def ChangeCamera(self):
         """ change camera index """
@@ -198,6 +201,7 @@ class Camera(QtWidgets.QWidget):
 
     # signals
     m_Signal_Barcode_Found = pyqtSignal(list)       # signal if a barcodes was found
+    m_Signal_Kill = pyqtSignal(bool)                # signal that gets triggerd when camera gets killed
 
     # Status and cache vars
     m_Cameras_Available = []                        # list of all available camera indexes
@@ -227,9 +231,11 @@ class Camera(QtWidgets.QWidget):
         if self.m_Show_Preview == False:
             self.Hide_Preview()
             self.pushButton_Picture.hide()
+            self.pushButton_Video.hide()
         else:
             self.Show_Preview()
             self.pushButton_Picture.show()
+            self.pushButton_Video.show()
         if self.m_Show_Folders == False:
             self.Hide_Folders()
         else:
@@ -252,6 +258,7 @@ class Camera(QtWidgets.QWidget):
         self.m_Thread_Video.m_Signal_CamerasAvailable.connect(self._UpdateAvailableCameras) # updates interfac
         self.m_Thread_Video.m_Signal_Codes.connect(self._CodesFound)    # some barcodes found
         self.m_Thread_Video.m_Signal_Picture_Taken.connect(self._PictureTaken)  # picture was taken
+        self.m_Thread_Video.m_Signal_Video_Taken.connect(self._VideoTaken)  # picture was taken
 
         self.m_Thread_Video.start()
 
@@ -292,6 +299,50 @@ class Camera(QtWidgets.QWidget):
         self.m_Signal_Barcode_Found.emit(f_Result)
         self._KillCamera()
 
+    def _VideoTaken(self, f_Result:str):
+        """
+        video was taken
+        :param f_Result: path to file
+        :return:
+        """
+        if self.m_Sound_Active == True:
+            QSound.play(os.path.dirname(os.path.realpath(__file__)) + "/Sounds/Shutter.wav")
+
+        # get frame for thumbnail
+        _Cap = cv2.VideoCapture(f_Result)
+        _Tot_Frames = int(_Cap.get(cv2.CAP_PROP_FRAME_COUNT) * 0.94)
+        if not _Cap.isOpened() and _Tot_Frames <= 0: # something went wrong
+            return
+        _Cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        _, _Image = _Cap.retrieve()
+
+        rgb_image = cv2.cvtColor(_Image, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888).scaledToWidth(250, Qt.FastTransformation)
+
+        _Frame = QtWidgets.QFrame()
+        _VLayout = QtWidgets.QVBoxLayout(_Frame)
+        # preview picture
+        #_Picture = QImage(f_Result).scaledToWidth(250, Qt.FastTransformation)
+        _Label = QtWidgets.QLabel()
+        _Label.setAlignment(Qt.AlignCenter)
+        _Label.setPixmap(QPixmap.fromImage(convert_to_Qt_format))
+        _VLayout.addWidget(_Label)
+
+        # add delete button
+        _Button = QtWidgets.QPushButton()
+        _Button.setText("Video löschen")
+        _Button.setStyleSheet("QPushButton { border: 1px solid#A2a2a2; background: #FF7F7F; color: #1a82b1;font-size:14pt; font-family: voestalpine; padding:10px 10px; text-align:left;}")
+        _Button.mouseReleaseEvent = lambda e, x=_Frame, y=f_Result: self._DeleteMediaFromPreview(x, y)
+        # icon
+        _Icon = QIcon()
+        _Icon.addFile(os.path.dirname(os.path.realpath(__file__)) + "/Images/Delete-Picture.png", QSize(32, 32))
+        _Button.setIcon(_Icon)
+
+        _VLayout.addWidget(_Button)
+        self.Preview_Layout.insertWidget(0, _Frame)
+
     def _PictureTaken(self, f_Result:str):
         """
         picture was taken
@@ -313,7 +364,8 @@ class Camera(QtWidgets.QWidget):
         # add delete button
         _Button = QtWidgets.QPushButton()
         _Button.setText("Bild löschen")
-        _Button.mouseReleaseEvent = lambda e, x=_Frame, y=f_Result: self._DeletePictureFromPreview(x, y)
+        _Button.setStyleSheet("QPushButton { border: 1px solid#A2a2a2; background: #FF7F7F; color: #1a82b1;font-size:14pt; font-family: voestalpine; padding:10px 10px; text-align:left;}")
+        _Button.mouseReleaseEvent = lambda e, x=_Frame, y=f_Result: self._DeleteMediaFromPreview(x, y)
         # icon
         _Icon = QIcon()
         _Icon.addFile(os.path.dirname(os.path.realpath(__file__)) + "/Images/Delete-Picture.png", QSize(32, 32))
@@ -330,7 +382,7 @@ class Camera(QtWidgets.QWidget):
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
         self.CameraViewer.setPixmap(QPixmap.fromImage(convert_to_Qt_format))
 
-    def _DeletePictureFromPreview(self, f_Frame:QtWidgets.QFrame, f_File:str):
+    def _DeleteMediaFromPreview(self, f_Frame:QtWidgets.QFrame, f_File:str):
         """
         delete a picture from the preview list
         :param f_Frame: Frame to delete

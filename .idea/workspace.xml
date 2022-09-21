@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="352c1bce-bab8-41e7-ab57-a6eb9e52e007" name="Changes" comment="Changes" />
+    <list default="true" id="352c1bce-bab8-41e7-ab57-a6eb9e52e007" name="Changes" comment="Changes">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtCamera/Camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/QtCamera/Camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtCamera/Interface/Camera.ui" beforeDir="false" afterPath="$PROJECT_DIR$/QtCamera/Interface/Camera.ui" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
