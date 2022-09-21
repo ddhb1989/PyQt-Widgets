@@ -139,7 +139,6 @@ class VideoThread(QThread):
     def run(self):
         # get available cameras
         self.m_Cameras_Available = self._GetAvailableCameras()
-        self.m_Signal_CamerasAvailable.emit(self.m_Cameras_Available)
 
         # start cam
         self.m_Camera_Run = True
@@ -150,6 +149,10 @@ class VideoThread(QThread):
         self.m_Cap = cv2.VideoCapture(self.m_Camera_Current, cv2.CAP_DSHOW)
         self.m_Cap.set(3, 1280)
         self.m_Cap.set(4, 720)
+
+        # send that cam is read
+        self.m_Signal_CamerasAvailable.emit(self.m_Cameras_Available)
+
         while self.m_Camera_Run:
             # get image from cam
             ret, self.m_CV_Img = self.m_Cap.read()
@@ -308,14 +311,17 @@ class Camera(QtWidgets.QWidget):
 
         # prepare interface
         self.Hide_Button_Change()
+        self.pushButton_Picture.hide()
+        self.pushButton_Video.hide()
         if self.m_Show_Preview == False:
             self.Hide_Preview()
             self.pushButton_Picture.hide()
             self.pushButton_Video.hide()
         else:
             self.Show_Preview()
-            self.pushButton_Picture.show()
-            self.pushButton_Video.show()
+            self.m_Thread_Video.m_Signal_CamerasAvailable.connect(lambda e: self.pushButton_Picture.show())
+            self.m_Thread_Video.m_Signal_CamerasAvailable.connect(lambda e: self.pushButton_Video.show())
+
         if self.m_Show_Folders == False:
             self.Hide_Folders()
         else:
