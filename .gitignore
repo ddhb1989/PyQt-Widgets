@@ -1,3 +1,4 @@
 # file: ~/.gitignore
 .idea
 **/__pycache__/
+**/Testalbum/
