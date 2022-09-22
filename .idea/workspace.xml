@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="352c1bce-bab8-41e7-ab57-a6eb9e52e007" name="Changes" comment="Changes" />
+    <list default="true" id="352c1bce-bab8-41e7-ab57-a6eb9e52e007" name="Changes" comment="Changes">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtCamera/Camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/QtCamera/Camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtCamera/Interface/Camera.ui" beforeDir="false" afterPath="$PROJECT_DIR$/QtCamera/Interface/Camera.ui" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,11 +37,11 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/MediaViewer.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Camera.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager">
-    <configuration name="MediaViewer" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+    <configuration name="Camera" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="PyQt-Widgets" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -49,7 +53,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MediaViewer.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Camera.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -80,7 +84,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/QtCamera/Camera.py</url>
-          <line>21</line>
+          <line>22</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>

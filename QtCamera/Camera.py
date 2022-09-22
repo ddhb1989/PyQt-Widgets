@@ -18,6 +18,7 @@
 # ```
 
 # TODO: Open Preview picture Maybe in our own Picture viewer Widget?
+# m_Preview_Scale not needed anymore
 # ---------------------------------------------------------------------------
 import cv2
 import pyaudio
@@ -161,12 +162,12 @@ class VideoThread(QThread):
                 continue
 
             # resize image to a scale factor
-            _Width = int(self.m_CV_Img.shape[1] * self.m_Preview_Scale / 100)
-            _Height = int(self.m_CV_Img.shape[0] * self.m_Preview_Scale / 100)
+            #_Width = int(self.m_CV_Img.shape[1] * self.m_Preview_Scale / 100)
+            #_Height = int(self.m_CV_Img.shape[0] * self.m_Preview_Scale / 100)
 
             # resize image
-            _Resized = cv2.resize(self.m_CV_Img, (_Width, _Height), interpolation=cv2.INTER_AREA)
-            self.m_Signal_Frame.emit(_Resized)
+            #_Resized = cv2.resize(self.m_CV_Img, (_Width, _Height), interpolation=cv2.INTER_AREA)
+            self.m_Signal_Frame.emit(self.m_CV_Img)
 
             if self.m_Video_Recording_Started == True:
                 self.m_Video_Writer.write(self.m_CV_Img)
@@ -218,7 +219,7 @@ class VideoThread(QThread):
 
             # merge video and audio
             import subprocess
-            cmd = os.path.dirname(os.path.realpath(__file__)) + "/ffmpeg.exe -y -ac 2 -channel_layout stereo -i " + self.m_Thread_Audio.m_Audio_Filename + " -i " + self.m_Video_Temp_Filename + " -pix_fmt yuv420p " + self.m_Video_Filename
+            cmd = os.path.dirname(os.path.realpath(__file__)) + "/ffmpeg.exe -y -ac 2 -channel_layout stereo -i \"" + self.m_Thread_Audio.m_Audio_Filename + "\" -i \"" + self.m_Video_Temp_Filename + "\" -pix_fmt yuv420p \"" + self.m_Video_Filename + "\""
             subprocess.call(cmd, shell=True)
             try:
                 os.remove(self.m_Thread_Audio.m_Audio_Filename)
@@ -476,7 +477,7 @@ class Camera(QtWidgets.QWidget):
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        self.CameraViewer.setPixmap(QPixmap.fromImage(convert_to_Qt_format))
+        self.CameraViewer.setPixmap(QPixmap.fromImage(convert_to_Qt_format).scaled(self.CameraViewer.width(),self.CameraViewer.height(),Qt.KeepAspectRatio))
 
     def _DeleteMediaFromPreview(self, f_Frame:QtWidgets.QFrame, f_File:str):
         """
