@@ -186,8 +186,11 @@ class VideoThread(QThread):
                 self.m_Signal_Codes.emit(_List)
                 self.StopCamera()
 
-    def TakePicture(self):
-        """ take/save a picture """
+    def TakePicture(self) -> str:
+        """
+         take/save a picture
+        :return: path to file
+        """
         if not hasattr(self, "m_CV_Img"): # webcam is not loaded
             return
 
@@ -199,6 +202,7 @@ class VideoThread(QThread):
             _Filename = self.m_Path_Save + '\\' + str(int(time.time())) + '.jpg'
             cv2.imwrite(_Filename, self.m_CV_Img)
             self.m_Signal_Picture_Taken.emit(_Filename)
+            return _Filename
         except Exception as e:
             print(e)
 
@@ -288,6 +292,8 @@ class Camera(QtWidgets.QWidget):
     # signals
     m_Signal_Barcode_Found = pyqtSignal(list)       # signal if a barcodes was found
     m_Signal_Kill = pyqtSignal(bool)                # signal that gets triggerd when camera gets killed
+    m_Signal_Picture_Taken = pyqtSignal(str)        # signal returns file name
+    m_Signal_Video_Taken = pyqtSignal(str)          # signal returns file name
 
     # Status and cache vars
     m_Cameras_Available = []                        # list of all available camera indexes
@@ -326,8 +332,8 @@ class Camera(QtWidgets.QWidget):
             self.pushButton_Video.hide()
         else:
             self.Show_Preview()
-            self.m_Thread_Video.m_Signal_CamerasAvailable.connect(lambda e: self.pushButton_Picture.show())
-            self.m_Thread_Video.m_Signal_CamerasAvailable.connect(lambda e: self.pushButton_Video.show())
+            self.m_Thread_Video.m_Signal_CamerasAvailable.connect(lambda e: [self.pushButton_Picture.show(), self.pushButton_Video.show()])
+            #self.m_Thread_Video.m_Signal_CamerasAvailable.connect(lambda e: self.pushButton_Video.show())
 
         if self.m_Show_Folders == False:
             self.Hide_Folders()
@@ -528,7 +534,8 @@ class Camera(QtWidgets.QWidget):
         # if we record stop recording
         if self.m_Thread_Video.m_Video_Recording_Started == True:
             self._RecordVideo()
-        self.m_Thread_Video.TakePicture()
+        _File = self.m_Thread_Video.TakePicture()
+        self.m_Signal_Picture_Taken.emit(_File)
 
     def _RecordVideo(self):
         """ record a video """
@@ -541,15 +548,14 @@ class Camera(QtWidgets.QWidget):
             self.RecordingLabel.setIcon(_Icon)
 
         # start recording
-        self.m_Thread_Video.RecordVideo()
-
+        _File = self.m_Thread_Video.RecordVideo()
+        self.m_Signal_Video_Taken.emit(_File)
         if self.pushButton_Video.text() == "Video aufnehmen":
             self.pushButton_Video.setText("Aufnahme stoppen")
             self.RecordingLabel.show()
         else:
             self.pushButton_Video.setText("Video aufnehmen")
             self.RecordingLabel.hide()
-
 
     def _UpdateAvailableCameras(self, f_Result:list):
         """ connected method for Video thread that returns available cameras """
