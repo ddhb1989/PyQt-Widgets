@@ -20,7 +20,16 @@ class Example(QtWidgets.QMainWindow):
         uic.loadUi('Example.ui', self)
         self.show()
 
+<<<<<<< Updated upstream
         _Viewer = MediaViewer(m_Directory=r'J:\ETZ\2_FB\1_EMaschinen\2_M E-Maschinen\16_EHW_Workflow\2_Offene Auftraege\80041853') # os.path.dirname(os.path.realpath(__file__))+ "/QtMediaViewer/Testalbum")
+=======
+<<<<<<< HEAD
+        _Viewer = MediaViewer(m_Directory=os.path.dirname(os.path.realpath(__file__))+ "/QtMediaViewer/Testalbum",
+                              m_PreviewSize=150)
+=======
+        _Viewer = MediaViewer(m_Directory=r'J:\ETZ\2_FB\1_EMaschinen\2_M E-Maschinen\16_EHW_Workflow\2_Offene Auftraege\80041853') # os.path.dirname(os.path.realpath(__file__))+ "/QtMediaViewer/Testalbum")
+>>>>>>> 84b7a19edb4df4457ce030c36071c378b2aaadb7
+>>>>>>> Stashed changes
 
         self.Layout.addWidget(_Viewer)
 

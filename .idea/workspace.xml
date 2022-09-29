@@ -6,6 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="352c1bce-bab8-41e7-ab57-a6eb9e52e007" name="Changes" comment="Changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/MediaViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/MediaViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtMediaViewer/Images/Folder.png" beforeDir="false" afterPath="$PROJECT_DIR$/QtMediaViewer/Images/Folder.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtMediaViewer/Interface/MediaViewer.ui" beforeDir="false" afterPath="$PROJECT_DIR$/QtMediaViewer/Interface/MediaViewer.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/QtMediaViewer/MediaViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/QtMediaViewer/MediaViewer.py" afterDir="false" />
+=======
+>>>>>>> 84b7a19edb4df4457ce030c36071c378b2aaadb7
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +42,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  }
+}]]></component>
+=======
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
@@ -39,6 +56,7 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
+>>>>>>> 84b7a19edb4df4457ce030c36071c378b2aaadb7
   <component name="RunManager">
     <configuration name="MediaViewer" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="PyQt-Widgets" />
