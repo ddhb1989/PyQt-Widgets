@@ -122,7 +122,7 @@ class MediaViewer(QWidget):
 
     # Configurations
     m_Directory: str = "/"      # media folder
-    m_PreviewSize: int = 200     # size for preview
+    m_PreviewHeight: int = 200     # size for preview
 
     m_Structure = {}          # saves our folder and file structire
 
@@ -181,9 +181,11 @@ class MediaViewer(QWidget):
 
         for _Folder in f_Result:
             if _Folder not in self.m_Structure:
+                print("Reload")
                 self._Start_Thread_Files_LoadAllFilesFromFolder()
                 return
             if len(f_Result[_Folder]) != len(self.m_Structure[_Folder]):
+                print("Reload")
                 self._Start_Thread_Files_LoadAllFilesFromFolder()
                 return
 
@@ -200,7 +202,7 @@ class MediaViewer(QWidget):
         _Mime_Picture.load(os.path.dirname(os.path.realpath(__file__)) + "/Images/Picture.png")
         _Mime_Video = QPixmap()
         _Mime_Video.load(os.path.dirname(os.path.realpath(__file__)) + "/Images/Video.png")
-
+       
         # loop through all folder
         for _Folder in self.m_Structure:
             # start filesystem watchers
@@ -263,7 +265,7 @@ class MediaViewer(QWidget):
                 # create preview in a seperate thread
                 # because it could take some time
                 self.m_Thread_Files_CalculatePreview[os.path.join(self.m_Directory, _File)] = Files_CalculatePreview()
-                self.m_Thread_Files_CalculatePreview[os.path.join(self.m_Directory, _File)].m_PreviewSize = self.m_PreviewSize
+                self.m_Thread_Files_CalculatePreview[os.path.join(self.m_Directory, _File)].m_PreviewHeight = self.m_PreviewHeight
                 self.m_Thread_Files_CalculatePreview[os.path.join(self.m_Directory, _File)].m_File = os.path.join(self.m_Directory, _File)
                 # what did i do here?
                 # get pixmap from thread and set it to qlabel

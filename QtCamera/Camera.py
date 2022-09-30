@@ -16,6 +16,7 @@
 # pip install ffmpeg-pythonm
 # pip install pyaudio
 # ```
+# we use the image viewer ImageGlass in the Package QtMediaWidget
 
 # TODO: Open Preview picture Maybe in our own Picture viewer Widget?
 # ---------------------------------------------------------------------------
@@ -33,6 +34,12 @@ from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QTimer, pyqtSignal, QThread, Qt, QSize
 from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtMultimedia import QSound, QCamera
+
+try:
+    from QtMediaViewer.MediaViewer import MediaViewer
+    IMAGEGLASS_AVAILABLE = True
+except:
+    IMAGEGLASS_AVAILABLE = False
 
 
 """ POPUP Window for new folder creation """
