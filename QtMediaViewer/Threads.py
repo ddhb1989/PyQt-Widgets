@@ -68,7 +68,6 @@ class Files_LoadAllFilesFromFolder(QThread):
             # no video or image? Go away
             _Type = mimetypes.guess_type(os.path.join(f_Dir, _File))[0].split("/")[0]
             if _Type not in ("video", "image"):
-                print(_Type)
                 continue
 
             # WTF are you?

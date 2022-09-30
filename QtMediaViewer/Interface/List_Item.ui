@@ -123,8 +123,8 @@ background: #FFF;</string>
     <widget class="QLineEdit" name="UI_Filename">
      <property name="font">
       <font>
-       <family>Tahoma</family>
-       <pointsize>10</pointsize>
+       <family>voestalpine</family>
+       <pointsize>12</pointsize>
       </font>
      </property>
      <property name="styleSheet">

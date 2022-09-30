@@ -181,11 +181,9 @@ class MediaViewer(QWidget):
 
         for _Folder in f_Result:
             if _Folder not in self.m_Structure:
-                print("Reload")
                 self._Start_Thread_Files_LoadAllFilesFromFolder()
                 return
             if len(f_Result[_Folder]) != len(self.m_Structure[_Folder]):
-                print("Reload")
                 self._Start_Thread_Files_LoadAllFilesFromFolder()
                 return
 

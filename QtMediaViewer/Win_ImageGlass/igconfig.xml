@@ -61,7 +61,7 @@
       <Item key="SlideShowInterval" value="5" />
       <Item key="SlideShowIntervalTo" value="5" />
       <Item key="ThumbnailDimension" value="96" />
-      <Item key="ThumbnailBarWidth" value="330" />
+      <Item key="ThumbnailBarWidth" value="1075" />
       <Item key="ImageBoosterCachedCount" value="1" />
       <Item key="NumberImagesNotify" value="5" />
       <Item key="ZoomLockValue" value="100" />
@@ -69,7 +69,7 @@
       <Item key="ImageEditQuality" value="100" />
       <Item key="ImageVerticalPanningSpeed" value="40" />
       <Item key="ImageHorizontalPanningSpeed" value="40" />
-      <Item key="FrmMainWindowState" value="Normal" />
+      <Item key="FrmMainWindowState" value="Maximized" />
       <Item key="FrmSettingsWindowState" value="Normal" />
       <Item key="FrmExifToolWindowState" value="Normal" />
       <Item key="ImageLoadingOrder" value="Name" />
@@ -85,7 +85,7 @@
       <Item key="ColorProfile" value="CurrentMonitorProfile" />
       <Item key="ToolbarButtons" value="btnBack;btnNext;Separator;btnRotateLeft;btnRotateRight;btnFlipHorz;btnFlipVert;btnCrop;Separator;Separator;btnRefresh;Separator;btnThumb;btnDelete;Separator;btnEdit;" />
       <Item key="AutoUpdate" value="0" />
-      <Item key="LastSeenImagePath" value="C:\Users\Bernhard\Documents\GitHub\PyQt-Widgets\QtMediaViewer\Testalbum\image2.heic" />
+      <Item key="LastSeenImagePath" value="J:\ETZ\2_FB\1_EMaschinen\2_M E-Maschinen\16_EHW_Workflow\2_Offene Auftraege\80038415\Aufnahmen\1651203848849449800.jpg" />
       <Item key="ExifToolExePath" value="" />
       <Item key="ExifToolCommandArgs" value="" />
       <Item key="ZoomLevels" value="5;10;15;20;30;40;50;60;70;80;90;100;125;150;175;200;250;300;350;400;500;600;700;800;1000;1200;1500;1800;2100;2500;3000;3500" />
@@ -94,7 +94,7 @@
       <Item key="SinglePageFormats" value="*.heic;*.heif;*.psd;" />
       <Item key="KeyComboActions" value="LeftRight:PrevNextImage;PageUpDown:PrevNextImage;SpaceBack:PauseSlideshow;UpDown:PauseSlideshow;" />
       <Item key="BackgroundColor" value="#232A30" />
-      <Item key="FrmMainWindowBound" value="1483;0;1527;1392" />
+      <Item key="FrmMainWindowBound" value="102;102;1527;1392" />
       <Item key="FrmSettingsWindowBound" value="280;125;1050;750" />
       <Item key="FrmExifToolWindowBound" value="280;125;800;600" />
       <Item key="Language" value="German.v8.6.iglang" />
