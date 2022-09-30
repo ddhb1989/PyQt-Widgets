@@ -121,10 +121,10 @@ class QWidget_Header(QWidget):
 class MediaViewer(QWidget):
 
     # Configurations
-    m_Directory: str = "/"      # media folder
-    m_PreviewHeight: int = 200     # size for preview
-
-    m_Structure = {}          # saves our folder and file structire
+    m_Directory: str = "/"          # media folder
+    m_PreviewHeight: int = 200      # size for preview
+    m_ZoomScale: int = 50           # zoom in/out steps
+    m_Structure = {}                # saves our folder and file structure
 
     def __init__(self, *args, **kwargs):
         QWidget.__init__(self)
@@ -141,6 +141,8 @@ class MediaViewer(QWidget):
         _Effect = QGraphicsOpacityEffect()
         _Effect.setOpacity(0.3)
         self.UI_ImageLoading.setGraphicsEffect(_Effect)
+        self.UI_ZoomIn.mouseReleaseEvent = lambda e: self._ZoomInOnPreview()
+        self.UI_ZoomOut.mouseReleaseEvent = lambda e: self._ZoomOutOnPreview()
 
         # load all files in a thread from our folder
         self._Start_Thread_Files_LoadAllFilesFromFolder()
@@ -272,13 +274,14 @@ class MediaViewer(QWidget):
                 # that takes time to figure out -.-
                 # doItemsLayout() updates GUI that it is shown without scaling problems
                 self.m_Thread_Files_CalculatePreview[os.path.join(self.m_Directory, _File)].m_Signal_Preview.connect(
-                    lambda w, x=_Widget, y=_Item, z=_List:
-                    [x.UI_Preview.setPixmap(w),
-                     x.setMinimumWidth(w.width()),
-                     x.setMinimumHeight(w.height()),
-                     y.setSizeHint(x.sizeHint()),
-                     z.setItemWidget(y, x),
-                     z.doItemsLayout()])
+                    lambda w, x=_Widget, y=_Item, z=_List: [
+                        x.UI_Preview.setPixmap(w),
+                        #x.UI_Preview.setFixedWidth(w.width()),
+                        # x.UI_Preview.setFixedHeight(w.height()),
+                        x.adjustSize(),
+                        y.setSizeHint(x.sizeHint()),
+                        z.setItemWidget(y, x),
+                        z.doItemsLayout()])
 
                 # set mime type image
                 self.m_Thread_Files_CalculatePreview[os.path.join(self.m_Directory, _File)].m_Signal_MediaType.connect(lambda e, x=_Widget: x.UI_Mime.setPixmap(_Mime_Picture) if e=="picture" else x.UI_Mime.setPixmap(_Mime_Video))
@@ -301,24 +304,20 @@ class MediaViewer(QWidget):
         _PopUp = PopUp_Delete(self)
         _PopUp.m_Signal_Ack.connect(_Delete)
 
-    def _OpenFile(self, f_Path: str=""):
-        """
-        try to open a path or media file
-        :param f_Path: file path
-        :return:
-        """
-        # folder
-        if os.path.isdir(f_Path):
-            os.startfile(f_Path)
-            return
-        # video
-        if os.path.splitext(f_Path)[1] in (".mpg"," .mpeg", ".mp4", ".avi", ".mov"):
-            os.startfile(f_Path)
-            return
+    def _ZoomInOnPreview(self):
+        """ regenerate preview pictures and zoom in """
+        for _File in self.m_Thread_Files_CalculatePreview:
+            self.m_Thread_Files_CalculatePreview[_File].m_PreviewHeight += self.m_ZoomScale
+            self.m_Thread_Files_CalculatePreview[_File].start()
 
-        # picture
-        cmd = os.path.dirname(os.path.realpath(__file__)) + "/Win_ImageGlass/ImageGlass.exe \"{}\"".format(os.path.normpath(f_Path))
-        subprocess.Popen(cmd, shell=False)
+    def _ZoomOutOnPreview(self):
+        """ regenerate preview pictures and zoom in """
+        for _File in self.m_Thread_Files_CalculatePreview:
+            if self.m_Thread_Files_CalculatePreview[_File].m_PreviewHeight <= self.m_PreviewHeight:
+                return
+
+            self.m_Thread_Files_CalculatePreview[_File].m_PreviewHeight -= self.m_ZoomScale
+            self.m_Thread_Files_CalculatePreview[_File].start()
 
     def _Layout_Clear(self, f_Layout: QLayout):
         """
@@ -328,6 +327,30 @@ class MediaViewer(QWidget):
         """
         for i in reversed(range(f_Layout.count())):
             f_Layout.itemAt(i).widget().setParent(None)
+
+    @staticmethod
+    def _OpenFile(f_Path: str=""):
+        """
+        try to open a path or media file
+        can be used as a staticmethod in other files
+        :param f_Path: file path
+        :return:
+        """
+        print(f_Path)
+        # folder
+        if os.path.isdir(f_Path):
+            os.startfile(f_Path)
+            return
+        # video
+        if mimetypes.guess_type(f_Path)[0].startswith("video"):
+            os.startfile(f_Path)
+            return
+
+        # picture
+        print(f_Path)
+        cmd = os.path.dirname(os.path.realpath(__file__)) + "/Win_ImageGlass/ImageGlass.exe \"{}\"".format(os.path.normpath(f_Path))
+        subprocess.Popen(cmd, shell=False)
+
 
 
 

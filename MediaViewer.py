@@ -20,8 +20,9 @@ class Example(QtWidgets.QMainWindow):
         uic.loadUi('Example.ui', self)
         self.show()
         print(os.path.dirname(os.path.realpath(__file__))+ "/QtMediaViewer/")
-        _Viewer = MediaViewer(m_Directory=r"J:\ETZ\2_FB\1_EMaschinen\2_M E-Maschinen\16_EHW_Workflow\2_Offene Auftraege\80038415",#os.path.dirname(os.path.realpath(__file__)) + "/QtMediaViewer/Testalbum",
-                              m_PreviewHeight=100)
+        _Viewer = MediaViewer(m_Directory=os.path.dirname(os.path.realpath(__file__)) + "/QtMediaViewer/Testalbum",
+                              m_PreviewHeight=150,
+                              m_ZoomScale=50)
 
         self.Layout.addWidget(_Viewer)
 

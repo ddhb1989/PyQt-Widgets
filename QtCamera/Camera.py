@@ -36,6 +36,12 @@ from PyQt5.QtCore import QTimer, pyqtSignal, QThread, Qt, QSize
 from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtMultimedia import QSound, QCamera
 
+# try to get ImageGlass from QtMediaViewer
+try:
+    from QtMediaViewer import MediaViewer
+    IMAGEGLASS_AVAILABLE = True
+except:
+    IMAGEGLASS_AVAILABLE = False
 
 """ POPUP Window for new folder creation """
 class PopUp_NewFolder(QtWidgets.QWidget):
@@ -463,6 +469,10 @@ class Camera(QtWidgets.QWidget):
         _Icon.addFile(os.path.dirname(os.path.realpath(__file__)) + "/Images/Delete-Picture.png", QSize(32, 32))
         _Button.setIcon(_Icon)
 
+        # if imageglass from QtMediaViewer is available we can open the video
+        if IMAGEGLASS_AVAILABLE:
+            _Label.mouseReleaseEvent = lambda e, x=f_Result: MediaViewer.MediaViewer._OpenFile(x)
+
         _VLayout.addWidget(_Button)
         self.Preview_Layout.insertWidget(0, _Frame)
 
@@ -489,8 +499,6 @@ class Camera(QtWidgets.QWidget):
         _Label.setPixmap(QPixmap.fromImage(_Picture))
         _VLayout.addWidget(_Label)
 
-
-
         # add delete button
         _Button = QtWidgets.QPushButton()
         _Button.setText("Bild löschen")
@@ -511,6 +519,11 @@ class Camera(QtWidgets.QWidget):
             _Button.mouseReleaseEvent = lambda e, x=_Frame, y=_PDF: self._DeleteMediaFromPreview(x, y)
         else:
             _Button.mouseReleaseEvent = lambda e, x=_Frame, y=f_Result: self._DeleteMediaFromPreview(x, y)
+
+        # if imageglass from QtMediaViewer is available we can open the picture
+        print(f_Result)
+        if IMAGEGLASS_AVAILABLE:
+            _Label.mouseReleaseEvent = lambda e, x=f_Result: MediaViewer.MediaViewer._OpenFile(x)
         # icon
         _Icon = QIcon()
         _Icon.addFile(os.path.dirname(os.path.realpath(__file__)) + "/Images/Delete-Picture.png", QSize(32, 32))
