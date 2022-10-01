@@ -38,7 +38,7 @@ from PyQt5.QtMultimedia import QSound, QCamera
 
 # try to get ImageGlass from QtMediaViewer
 try:
-    from QtMediaViewer import MediaViewer
+    from ..QtMediaViewer.MediaViewer import MediaViewer
     IMAGEGLASS_AVAILABLE = True
 except:
     IMAGEGLASS_AVAILABLE = False
@@ -521,9 +521,8 @@ class Camera(QtWidgets.QWidget):
             _Button.mouseReleaseEvent = lambda e, x=_Frame, y=f_Result: self._DeleteMediaFromPreview(x, y)
 
         # if imageglass from QtMediaViewer is available we can open the picture
-        print(f_Result)
         if IMAGEGLASS_AVAILABLE:
-            _Label.mouseReleaseEvent = lambda e, x=f_Result: MediaViewer.MediaViewer._OpenFile(x)
+            _Label.mouseReleaseEvent = lambda e, x=f_Result: MediaViewer._OpenFile(x)
         # icon
         _Icon = QIcon()
         _Icon.addFile(os.path.dirname(os.path.realpath(__file__)) + "/Images/Delete-Picture.png", QSize(32, 32))

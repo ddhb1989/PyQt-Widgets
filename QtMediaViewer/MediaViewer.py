@@ -197,6 +197,15 @@ class MediaViewer(QWidget):
         :return:
         """
         self.m_Structure = f_Result
+        if len(self.m_Structure) > 0:
+            self.UI_FrameNoMedia.setVisible(False)
+            self.UI_SpacerNoMedia.setVisible(False)
+        else:
+            self.UI_StackedWidget.setCurrentIndex(self.UI_StackedWidget.indexOf(self.UI_MediaViewer))
+            self.Contents_Layout.addWidget(self.UI_FrameNoMedia)
+            self.Contents_Layout.addWidget(self.UI_SpacerNoMedia)
+            self.UI_FrameNoMedia.setVisible(True)
+            self.UI_SpacerNoMedia.setVisible(True)
 
         _Mime_Picture = QPixmap()
         _Mime_Picture.load(os.path.dirname(os.path.realpath(__file__)) + "/Images/Picture.png")
@@ -336,7 +345,6 @@ class MediaViewer(QWidget):
         :param f_Path: file path
         :return:
         """
-        print(f_Path)
         # folder
         if os.path.isdir(f_Path):
             os.startfile(f_Path)
@@ -347,7 +355,6 @@ class MediaViewer(QWidget):
             return
 
         # picture
-        print(f_Path)
         cmd = os.path.dirname(os.path.realpath(__file__)) + "/Win_ImageGlass/ImageGlass.exe \"{}\"".format(os.path.normpath(f_Path))
         subprocess.Popen(cmd, shell=False)
 
